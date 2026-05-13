@@ -14,6 +14,7 @@ from skill_manager.errors import MutationError
 
 
 _OPENCLAW_UNSUPPORTED_REASON = "Smithery does not provide an OpenClaw MCP installer target"
+_QODER_UNSUPPORTED_REASON = "Smithery does not provide a Qoder MCP installer target"
 _SMITHERY_CLI_PACKAGE = "@smithery/cli@4.11.1"
 _ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
 
@@ -45,6 +46,12 @@ _SMITHERY_CLIENT_TARGETS: tuple[SmitheryClientTarget, ...] = (
         smithery_client=None,
         supported=False,
         reason=_OPENCLAW_UNSUPPORTED_REASON,
+    ),
+    SmitheryClientTarget(
+        harness="qoder",
+        smithery_client=None,
+        supported=False,
+        reason=_QODER_UNSUPPORTED_REASON,
     ),
 )
 _SMITHERY_TARGETS_BY_HARNESS = {target.harness: target for target in _SMITHERY_CLIENT_TARGETS}

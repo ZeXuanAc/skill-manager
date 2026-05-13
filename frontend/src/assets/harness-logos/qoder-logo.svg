@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="640" height="640" shape-rendering="crispEdges">
+  <!-- Bright green rounded body -->
+  <path
+    fill="#22D17A"
+    d="M3 1H17V2H3z
+       M2 2H18V3H2z
+       M1 3H19V17H1z
+       M2 17H18V18H2z
+       M3 18H17V19H3z"
+  />
+  <!-- White Q ring -->
+  <path
+    fill="#FFFFFF"
+    d="M7 5H13V6H7z
+       M5 6H7V7H5z
+       M13 6H15V7H13z
+       M4 7H6V13H4z
+       M14 7H16V13H14z
+       M5 13H7V14H5z
+       M13 13H15V14H13z
+       M7 14H13V15H7z"
+  />
+  <!-- White Q tail dot at bottom-right -->
+  <rect x="13" y="13" width="2" height="2" fill="#FFFFFF"/>
+</svg>

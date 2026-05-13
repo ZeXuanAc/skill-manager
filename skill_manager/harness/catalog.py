@@ -181,6 +181,34 @@ SUPPORTED_HARNESS_DEFINITIONS: tuple[HarnessDefinition, ...] = (
         },
     ),
     HarnessDefinition(
+        harness="qoder",
+        label="Qoder",
+        logo_key="qoder",
+        install_probe="qoder",
+        bindings={
+            "skills": FileTreeBindingProfile(
+                managed_env="SKILL_MANAGER_QODER_ROOT",
+                managed_default=lambda context: context.home / ".qoder" / "skills",
+            ),
+            "mcp": ConfigSubtreeBindingProfile(
+                config_path_resolver=lambda context: context.home / ".qoder" / "shared_client" / "mcp.json",
+                file_format="json",
+                subtree_path=("mcpServers",),
+                codec="claude-code",
+            ),
+            "slash_commands": CommandFileBindingProfile(
+                root_path_resolver=lambda context: context.home / ".qoder",
+                output_dir_resolver=lambda context: context.home / ".qoder" / "commands",
+                invocation_prefix="/",
+                render_format="frontmatter_markdown",
+                scope="global",
+                docs_url="https://docs.qoder.com",
+                file_glob="*.md",
+                supports_frontmatter=True,
+            ),
+        },
+    ),
+    HarnessDefinition(
         harness="openclaw",
         label="OpenClaw",
         logo_key="openclaw",

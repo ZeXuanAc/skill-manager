@@ -3,8 +3,9 @@ import codexLogo from "../../assets/harness-logos/codex-logo.svg";
 import cursorLogo from "../../assets/harness-logos/cursor-logo.svg";
 import openclawLogo from "../../assets/harness-logos/openclaw-logo.svg";
 import opencodeLogo from "../../assets/harness-logos/opencode-logo.svg";
+import qoderLogo from "../../assets/harness-logos/qoder-logo.svg";
 
-export type HarnessLogoKey = "claude" | "codex" | "cursor" | "opencode" | "openclaw";
+export type HarnessLogoKey = "claude" | "codex" | "cursor" | "opencode" | "openclaw" | "qoder";
 
 interface HarnessPresentation {
   logoSrc: string;
@@ -31,6 +32,10 @@ const HARNESS_LOGO_ASSETS: Record<HarnessLogoKey, HarnessPresentation> = {
   openclaw: {
     logoSrc: openclawLogo,
     variant: "openclaw",
+  },
+  qoder: {
+    logoSrc: qoderLogo,
+    variant: "qoder",
   },
 };
 

@@ -191,7 +191,29 @@ SUPPORTED_HARNESS_DEFINITIONS: tuple[HarnessDefinition, ...] = (
                 managed_default=lambda context: context.home / ".qoder" / "skills",
             ),
             "mcp": ConfigSubtreeBindingProfile(
-                config_path_resolver=lambda context: context.home / ".qoder" / "shared_client" / "mcp.json",
+                config_path_resolver=lambda context: context.home
+                / "Library"
+                / "Application Support"
+                / "Qoder"
+                / "SharedClientCache"
+                / "extension"
+                / "local"
+                / "mcp.json",
+                discovery_config_path_resolvers=(
+                    lambda context: context.home
+                    / "Library"
+                    / "Application Support"
+                    / "Qoder"
+                    / "SharedClientCache"
+                    / "mcp.json",
+                    lambda context: context.home / ".qoder" / "shared_client" / "mcp.json",
+                    lambda context: context.home
+                    / ".qoder"
+                    / "shared_client"
+                    / "extension"
+                    / "local"
+                    / "mcp.json",
+                ),
                 file_format="json",
                 subtree_path=("mcpServers",),
                 codec="claude-code",

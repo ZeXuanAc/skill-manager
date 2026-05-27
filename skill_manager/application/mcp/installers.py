@@ -39,6 +39,7 @@ class SmitheryClientTarget:
 _SMITHERY_CLIENT_TARGETS: tuple[SmitheryClientTarget, ...] = (
     SmitheryClientTarget(harness="codex", smithery_client="codex", supported=True),
     SmitheryClientTarget(harness="claude", smithery_client="claude-code", supported=True),
+    SmitheryClientTarget(harness="claude-desktop", smithery_client="claude", supported=True),
     SmitheryClientTarget(harness="cursor", smithery_client="cursor", supported=True),
     SmitheryClientTarget(harness="opencode", smithery_client="opencode", supported=True),
     SmitheryClientTarget(

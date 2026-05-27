@@ -48,6 +48,7 @@ class FileBackedMcpAdapter(McpHarnessAdapter):
         self.config_path = profile.resolve_config_path(context)
         self._discovery_config_paths = profile.resolve_discovery_config_paths(context)
         self._install_probe = definition.install_probe
+        self._install_probe_paths = definition.resolve_install_probe_paths(context)
         self._path_env = context.env.get("PATH")
         self._file_format = profile.file_format
         self._write_subtree_path = profile.subtree_path
@@ -243,7 +244,9 @@ class FileBackedMcpAdapter(McpHarnessAdapter):
         return config_path.with_suffix(config_path.suffix + ".lock")
 
     def _is_installed(self) -> bool:
-        return shutil.which(self._install_probe, path=self._path_env) is not None
+        if shutil.which(self._install_probe, path=self._path_env) is not None:
+            return True
+        return any(path.exists() for path in self._install_probe_paths)
 
     def _read_entries(self) -> tuple[_RawEntry, ...]:
         entries: list[_RawEntry] = []

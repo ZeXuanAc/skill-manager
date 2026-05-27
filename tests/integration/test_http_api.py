@@ -19,7 +19,7 @@ class HttpApiTests(unittest.TestCase):
             self.assertTrue(health["ok"])
             self.assertEqual(skills["summary"], {"managed": 0, "unmanaged": 0})
             self.assertEqual(skills["rows"], [])
-            self.assertEqual(len(settings["harnesses"]), 5)
+            self.assertEqual(len(settings["harnesses"]), 7)
             openclaw = next(item for item in settings["harnesses"] if item["harness"] == "openclaw")
             self.assertTrue(openclaw["installed"])
             self.assertTrue(openclaw["supportEnabled"])
@@ -75,7 +75,7 @@ class HttpApiTests(unittest.TestCase):
             self.assertEqual(detail["displayStatus"], "Managed")
             self.assertEqual(
                 [cell["label"] for cell in detail["harnessCells"]],
-                ["Codex", "Claude", "Cursor", "OpenCode", "OpenClaw"],
+                ["Codex", "Claude", "Cursor", "OpenCode", "Qoder", "OpenClaw"],
             )
             self.assertNotIn("updateStatus", detail["actions"])
             self.assertEqual(source_status["updateStatus"], "no_update_available")

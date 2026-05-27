@@ -141,6 +141,11 @@ skill-manager start
       <strong>OpenClaw</strong><br />
       <a href="https://docs.openclaw.ai/start/getting-started">Docs</a>
     </td>
+    <td align="center" valign="middle">
+      <img src="assets/harness-logos/claude-desktop-logo.svg" alt="Claude Desktop" height="56" /><br />
+      <strong>Claude Desktop</strong><br />
+      <a href="https://modelcontextprotocol.io/quickstart/user">Docs</a>
+    </td>
   </tr>
 </table>
 
@@ -151,6 +156,7 @@ skill-manager start
 | Cursor | Yes | Yes | Yes |
 | OpenCode | Yes | Yes | Yes |
 | OpenClaw | Yes | Not Yet | Not Yet |
+| Claude Desktop | Not Supported | Yes | Not Supported |
 
 ## Local-first safety
 
@@ -184,6 +190,7 @@ MCP servers are stored as normalized Skill Manager records, then translated into
 
 - Codex uses TOML under `mcp_servers`.
 - Claude Code and Cursor use `mcpServers` JSON entries.
+- Claude Desktop uses `mcpServers` JSON entries in `~/Library/Application Support/Claude/claude_desktop_config.json`.
 - OpenCode uses typed local/remote MCP entries.
 - OpenClaw MCP writes are not yet supported.
 

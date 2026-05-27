@@ -128,12 +128,16 @@ class HarnessDefinition:
     logo_key: str | None
     install_probe: str
     bindings: Mapping[FamilyKey, BindingProfile] = field(default_factory=dict)
+    install_probe_paths: tuple[PathResolver, ...] = ()
 
     def supports_family(self, family: FamilyKey) -> bool:
         return family in self.bindings
 
     def binding_for(self, family: FamilyKey) -> BindingProfile | None:
         return self.bindings.get(family)
+
+    def resolve_install_probe_paths(self, context: ResolutionContext) -> tuple[Path, ...]:
+        return tuple(resolver(context) for resolver in self.install_probe_paths)
 
 
 @dataclass(frozen=True)

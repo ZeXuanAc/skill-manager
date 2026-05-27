@@ -29,11 +29,13 @@ class FileTreeSkillsAdapter(SkillsHarnessAdapter):
         path_env: str | None,
         managed_root: Path,
         discovery_roots: tuple["_ResolvedRoot", ...],
+        install_probe_paths: tuple[Path, ...] = (),
     ) -> None:
         self.harness = harness
         self.label = label
         self.logo_key = logo_key
         self._install_probe = install_probe
+        self._install_probe_paths = install_probe_paths
         self._path_env = path_env
         self.managed_root = managed_root
         self._discovery_roots = self._dedupe_roots(discovery_roots)
@@ -148,7 +150,9 @@ class FileTreeSkillsAdapter(SkillsHarnessAdapter):
         return None
 
     def _is_installed(self) -> bool:
-        return shutil.which(self._install_probe, path=self._path_env) is not None
+        if shutil.which(self._install_probe, path=self._path_env) is not None:
+            return True
+        return any(path.exists() for path in self._install_probe_paths)
 
     def _dedupe_roots(
         self,
@@ -207,6 +211,7 @@ def build_skills_adapters(kernel: HarnessKernelService) -> tuple[FileTreeSkillsA
                 path_env=kernel.context.env.get("PATH"),
                 managed_root=managed_root,
                 discovery_roots=resolved_roots,
+                install_probe_paths=definition.resolve_install_probe_paths(kernel.context),
             )
         )
     return tuple(adapters)

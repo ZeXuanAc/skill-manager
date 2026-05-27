@@ -319,8 +319,11 @@ class McpRoutesTests(unittest.TestCase):
                 "/api/mcp/servers/exa/set-harnesses", {"target": "enabled"}
             )
             self.assertTrue(response["ok"])
-            # All five harnesses should have written
-            self.assertEqual(set(response["succeeded"]), {"codex", "claude", "opencode", "openclaw"})
+            # All writable harnesses should have written (cursor is the install source, so already bound)
+            self.assertEqual(
+                set(response["succeeded"]),
+                {"codex", "claude", "claude-desktop", "opencode", "openclaw"},
+            )
 
             # Verify each config file
             self.assertTrue((harness.spec.home / ".cursor" / "mcp.json").is_file())
@@ -328,6 +331,15 @@ class McpRoutesTests(unittest.TestCase):
             self.assertTrue((harness.spec.home / ".codex" / "config.toml").is_file())
             self.assertTrue((harness.spec.home / ".opencode" / "opencode.jsonc").is_file())
             self.assertTrue((harness.spec.home / ".openclaw" / "openclaw.json").is_file())
+            self.assertTrue(
+                (
+                    harness.spec.home
+                    / "Library"
+                    / "Application Support"
+                    / "Claude"
+                    / "claude_desktop_config.json"
+                ).is_file()
+            )
 
     def test_uninstall_cleans_all_harnesses_and_central(self) -> None:
         with AppTestHarness() as harness:

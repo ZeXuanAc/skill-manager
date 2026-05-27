@@ -84,16 +84,24 @@ class HarnessKernelService:
             managed_location = None
             if isinstance(skills_binding, FileTreeBindingProfile):
                 managed_location = skills_binding.resolve_managed_root(self.context)
+            installed = (
+                shutil.which(
+                    definition.install_probe,
+                    path=self.context.env.get("PATH"),
+                )
+                is not None
+            )
+            if not installed:
+                installed = any(
+                    path.exists()
+                    for path in definition.resolve_install_probe_paths(self.context)
+                )
             statuses.append(
                 HarnessStatus(
                     harness=definition.harness,
                     label=definition.label,
                     logo_key=definition.logo_key,
-                    installed=shutil.which(
-                        definition.install_probe,
-                        path=self.context.env.get("PATH"),
-                    )
-                    is not None,
+                    installed=installed,
                     managed_location=managed_location,
                 )
             )

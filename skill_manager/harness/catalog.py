@@ -231,6 +231,45 @@ SUPPORTED_HARNESS_DEFINITIONS: tuple[HarnessDefinition, ...] = (
         },
     ),
     HarnessDefinition(
+        harness="claude-desktop",
+        label="Claude Desktop",
+        logo_key="claude-desktop",
+        install_probe="claude-desktop",
+        install_probe_paths=(
+            # macOS app bundle location
+            lambda _context: Path("/Applications/Claude.app"),
+            # HOME-relative Claude Desktop support folder (sandbox-friendly fallback)
+            lambda context: context.home
+            / "Library"
+            / "Application Support"
+            / "Claude",
+        ),
+        bindings={
+            # Claude Desktop only loads MCP servers from claude_desktop_config.json.
+            #
+            # Do NOT add a "skills" binding here. Claude Desktop's skills are
+            # server-backed, not file-backed: the app zips the skill folder
+            # and POSTs it to `/api/organizations/{org}/skills/upload-skill`,
+            # and at session time the skill is mounted into a sandbox VM at
+            # `/sessions/{id}/mnt/.claude/skills/<name>/SKILL.md`. The local
+            # `~/Library/Application Support/Claude/skills/` directory is not
+            # read by Claude Desktop, so any FileTreeBindingProfile written
+            # there is dead state. Integrating Desktop skills would require
+            # calling the (undocumented) upload-skill API with org auth,
+            # which is out of scope for a local file-orchestration tool.
+            "mcp": ConfigSubtreeBindingProfile(
+                config_path_resolver=lambda context: context.home
+                / "Library"
+                / "Application Support"
+                / "Claude"
+                / "claude_desktop_config.json",
+                file_format="json",
+                subtree_path=("mcpServers",),
+                codec="claude-code",
+            ),
+        },
+    ),
+    HarnessDefinition(
         harness="openclaw",
         label="OpenClaw",
         logo_key="openclaw",

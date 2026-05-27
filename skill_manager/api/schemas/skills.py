@@ -110,6 +110,7 @@ class SkillDetailActionsResponse(BaseModel):
     stopManagingHarnessLabels: list[str]
     canDelete: bool
     deleteHarnessLabels: list[str]
+    canExport: bool
 
 
 class SkillLocationResponse(BaseModel):

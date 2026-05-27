@@ -4,6 +4,7 @@ from .inventory import InventoryColumn, InventoryEntry, InventorySighting, Skill
 from .policy import (
     attention_message,
     can_delete,
+    can_export,
     can_manage,
     cell_state,
     display_status,
@@ -42,6 +43,7 @@ def skill_detail_payload(
             "stopManagingHarnessLabels": linked_harness_labels(entry, columns),
             "canDelete": can_delete(entry),
             "deleteHarnessLabels": linked_harness_labels(entry, columns),
+            "canExport": can_export(entry),
         },
         "harnessCells": [cell_payload(entry, column) for column in columns],
         "locations": [sighting_payload(sighting) for sighting in entry.detail_sightings()],

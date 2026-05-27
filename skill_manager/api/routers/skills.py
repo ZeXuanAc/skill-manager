@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from urllib.parse import quote as urlquote
+
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from skill_manager.application import BackendContainer
 from skill_manager.api.deps import get_container
@@ -30,6 +32,22 @@ def get_skill_source_status(skill_ref: str, container: BackendContainer = Depend
     if payload is None:
         raise HTTPException(status_code=404, detail=f"unknown skill ref: {skill_ref}")
     return payload
+
+
+@router.get("/{skill_ref:path}/export")
+def export_skill(skill_ref: str, container: BackendContainer = Depends(get_container)) -> Response:
+    result = container.skills_queries.export_skill_zip(skill_ref)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"no exportable skill package: {skill_ref}")
+    zip_bytes, filename = result
+    # RFC 5987 filename* covers non-ASCII skill names; keep filename= for legacy.
+    quoted = urlquote(filename, safe="")
+    disposition = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{quoted}'
+    return Response(
+        content=zip_bytes,
+        media_type="application/zip",
+        headers={"Content-Disposition": disposition},
+    )
 
 
 @router.get("/{skill_ref:path}", response_model=SkillDetailResponse)

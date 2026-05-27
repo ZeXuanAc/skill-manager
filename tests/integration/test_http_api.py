@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import io
 import unittest
+import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 from tests.support.app_harness import AppTestHarness
@@ -116,6 +119,38 @@ class HttpApiTests(unittest.TestCase):
         with AppTestHarness() as harness:
             payload = harness.get_json("/api/skills/missing-entry", expected_status=404)
             self.assertIn("unknown skill ref", payload["error"])
+
+    def test_export_skill_returns_zip_with_skill_md_at_top_level_folder(self) -> None:
+        with AppTestHarness(mixed=True) as harness:
+            skills = harness.get_json("/api/skills")
+            shared_audit = next(row for row in skills["rows"] if row["name"] == "Shared Audit")
+            detail = harness.get_json(f"/api/skills/{shared_audit['skillRef']}")
+            self.assertTrue(detail["actions"]["canExport"])
+
+            with urlopen(f"{harness.base_url}/api/skills/{shared_audit['skillRef']}/export") as response:
+                self.assertEqual(response.status, 200)
+                self.assertEqual(response.headers["Content-Type"], "application/zip")
+                disposition = response.headers["Content-Disposition"]
+                self.assertIn('attachment; filename="', disposition)
+                self.assertIn(".zip", disposition)
+                body = response.read()
+
+            with zipfile.ZipFile(io.BytesIO(body)) as zf:
+                names = zf.namelist()
+                # Every entry must sit under a single top-level folder named after the skill package
+                top_levels = {name.split("/", 1)[0] for name in names if name}
+                self.assertEqual(len(top_levels), 1, f"expected single top-level folder, got {top_levels}")
+                # SKILL.md must be present
+                self.assertTrue(
+                    any(name.endswith("/SKILL.md") for name in names),
+                    f"expected SKILL.md in zip, got {names}",
+                )
+
+    def test_export_unknown_skill_returns_404(self) -> None:
+        with AppTestHarness() as harness:
+            with self.assertRaises(HTTPError) as cm:
+                urlopen(f"{harness.base_url}/api/skills/missing-entry/export")
+            self.assertEqual(cm.exception.code, 404)
 
     def test_frontend_routes_return_spa_shell_when_dist_is_present(self) -> None:
         with TemporaryDirectory(prefix="skill-manager-dist-") as tempdir:

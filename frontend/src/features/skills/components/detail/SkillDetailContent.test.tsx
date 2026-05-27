@@ -17,6 +17,7 @@ const unmanagedDetail: SkillDetail = {
     stopManagingHarnessLabels: [],
     canDelete: false,
     deleteHarnessLabels: [],
+    canExport: true,
   },
   harnessCells: [
     { harness: "codex", label: "Codex", state: "found", interactive: false },
@@ -128,6 +129,29 @@ describe("SkillDetailContent", () => {
     expect(screen.queryByText("Managed")).not.toBeInTheDocument();
   });
 
+  it("renders an Export ZIP download link when canExport is true and points at the skill export endpoint", () => {
+    render(
+      <SkillDetailContent
+        detail={unmanagedDetail}
+        actionErrorMessage=""
+        queryErrorMessage=""
+        pendingToggleHarnesses={new Set()}
+        pendingStructuralAction={null}
+        onClose={vi.fn()}
+        onDismissActionError={vi.fn()}
+        onManage={vi.fn()}
+        onToggleHarness={vi.fn()}
+        onUpdate={vi.fn()}
+        onRequestRemove={vi.fn()}
+        onRequestDelete={vi.fn()}
+      />,
+    );
+
+    const exportLink = screen.getByRole("link", { name: "Export ZIP" });
+    expect(exportLink).toHaveAttribute("download");
+    expect(exportLink.getAttribute("href")).toMatch(/\/skills\/unmanaged%3Atrace-lens\/export$/);
+  });
+
   it("shows the local-changes warning in the body and hides local_changes_detected from the footer rail", () => {
     render(
       <SkillDetailContent
@@ -139,6 +163,7 @@ describe("SkillDetailContent", () => {
           actions: {
             ...unmanagedDetail.actions,
             canManage: false,
+            canExport: false,
             updateStatus: "local_changes_detected" as unknown as SkillDetail["actions"]["updateStatus"],
           },
           locations: [

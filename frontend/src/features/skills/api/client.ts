@@ -9,6 +9,7 @@ import type {
   SkillsPageDto,
   SkillSourceStatusDto,
 } from "./types";
+import { apiPath } from "../../../api/paths";
 import { fetchJson, postJson } from "../../../api/http";
 
 export async function fetchSkillsPage(): Promise<SkillsPageDto> {
@@ -58,6 +59,15 @@ export async function unmanageSkill(skillRef: string): Promise<OkResponse> {
 
 export async function deleteSkill(skillRef: string): Promise<OkResponse> {
   return postJson<OkResponse>(`/skills/${encodeURIComponent(skillRef)}/delete`);
+}
+
+/**
+ * URL for the export-zip endpoint. We don't fetch this — we hand it to the
+ * browser via <a href download> so it streams to disk natively, without us
+ * having to buffer the bytes in JS and trigger a Blob download.
+ */
+export function buildSkillExportUrl(skillRef: string): string {
+  return apiPath(`/skills/${encodeURIComponent(skillRef)}/export`);
 }
 
 export async function manageAllSkills(): Promise<BulkManageResult> {

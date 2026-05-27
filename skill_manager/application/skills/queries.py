@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import io
+import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Literal
@@ -55,6 +57,40 @@ class SkillsQueryService:
         if entry is None:
             return None
         return source_status_payload(self.resolve_update_status(entry))
+
+    def export_skill_zip(self, skill_ref: str) -> tuple[bytes, str] | None:
+        """Materialize the skill's on-disk folder as a zip in memory.
+
+        Returns (zip_bytes, filename) or None when the skill is unknown or
+        no SKILL.md is reachable on disk. The zip is structured so unpacking
+        produces a single top-level folder named after the skill package
+        (matches what Cowork / GitHub-import flows expect).
+        """
+        entry = self.inventory().find(skill_ref)
+        if entry is None:
+            return None
+        root = self.resolve_detail_package_root(entry)
+        if root is None:
+            return None
+
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            for path in sorted(root.rglob("*")):
+                if not path.is_file() and not path.is_dir():
+                    # Skip pipes, sockets, broken symlinks, etc.
+                    continue
+                if _should_skip_export(path, root):
+                    continue
+                relative = path.relative_to(root)
+                arcname = f"{root.name}/{relative.as_posix()}"
+                if path.is_dir():
+                    # zipfile needs explicit dir entries to preserve empty dirs
+                    if not arcname.endswith("/"):
+                        arcname += "/"
+                    zf.writestr(zipfile.ZipInfo(arcname), b"")
+                else:
+                    zf.write(path, arcname)
+        return buffer.getvalue(), f"{root.name}.zip"
 
     def inventory(self) -> SkillInventory:
         snapshot = self.read_models.snapshot()
@@ -139,3 +175,15 @@ class SkillsQueryService:
 
     def can_stop_managing(self, entry: InventoryEntry) -> bool:
         return can_stop_managing(entry)
+
+
+_EXPORT_SKIP_NAMES = frozenset({".DS_Store", ".git", "__pycache__", ".pytest_cache", ".mypy_cache"})
+
+
+def _should_skip_export(path: Path, root: Path) -> bool:
+    """Filter junk that shouldn't ship in a skill export bundle."""
+    try:
+        relative_parts = path.relative_to(root).parts
+    except ValueError:
+        return True
+    return any(part in _EXPORT_SKIP_NAMES for part in relative_parts)

@@ -8,6 +8,7 @@ import { DetailSourceLinks, type DetailSourceLink } from "../../../../components
 import { ErrorBanner } from "../../../../components/ErrorBanner";
 import { LoadingSpinner } from "../../../../components/LoadingSpinner";
 import { skillStatusConcept } from "../../../../lib/product-language";
+import { buildSkillExportUrl } from "../../api/client";
 import type { StructuralSkillAction } from "../../model/pending";
 import type { HarnessCell, SkillDetail, SkillSourceLinks } from "../../model/types";
 import { SkillDetailHarnessMatrix } from "./SkillDetailHarnessMatrix";
@@ -187,6 +188,15 @@ export function SkillDetailContent({
               onRequestRemove={onRequestRemove}
             />
           ) : null}
+          {detail.actions.canExport ? (
+            <a
+              className="action-pill action-pill--md"
+              href={buildSkillExportUrl(detail.skillRef)}
+              download
+            >
+              Export ZIP
+            </a>
+          ) : null}
           {detail.actions.canDelete ? (
             <button
               type="button"
@@ -230,6 +240,7 @@ function computeShowFooter(detail: SkillDetail): boolean {
     detail.actions.canManage ||
     (detail.actions.updateStatus !== null && detail.actions.updateStatus !== "local_changes_detected") ||
     detail.actions.stopManagingStatus !== null ||
+    detail.actions.canExport ||
     detail.actions.canDelete
   );
 }

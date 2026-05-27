@@ -43,6 +43,18 @@ def can_delete(entry: InventoryEntry) -> bool:
     return entry.kind == "managed" and entry.package_dir is not None and entry.package_path is not None
 
 
+def can_export(entry: InventoryEntry) -> bool:
+    """Return True when there is at least one on-disk SKILL.md location to zip up.
+
+    Coarse-grained: the query layer still re-checks `SKILL.md` exists before
+    materializing a zip and returns 404 if not. This signal just lets the
+    UI know whether to render the Export button.
+    """
+    if entry.package_path is not None:
+        return True
+    return any(sighting.path is not None for sighting in entry.detail_sightings())
+
+
 def can_stop_managing(entry: InventoryEntry) -> bool:
     return entry.kind == "managed" and entry.package_dir is not None and entry.package_path is not None
 
